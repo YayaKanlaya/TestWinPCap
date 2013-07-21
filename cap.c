@@ -29,13 +29,57 @@ typedef struct ip_header{
     u_int   op_pad;         // Option + Padding
 }ip_header;
 
-/* UDP header*/
+/* UDP header */
 typedef struct udp_header{
     u_short sport;          // Source port
     u_short dport;          // Destination port
     u_short len;            // Datagram length
     u_short crc;            // Checksum
 }udp_header;
+
+typedef struct tcp_header { 
+	u_short sport; 	// Source port 
+	u_short dport; 	// Destination port 
+	u_int seqnum; 	// Sequence Number 
+	u_int acknum; 	// Acknowledgement number 
+	u_char th_off; 	// Header length 
+	u_char flags; 	// packet flags 
+	u_short win; 	// Window size 
+	u_short crc; 	// Header Checksum 
+	u_short urgptr; // Urgent pointer...still don't know what this is...
+}tcp_header; 
+
+/* TCP header */
+/*
+typedef struct tcp_header_
+{
+    unsigned short source_port; // source port
+    unsigned short dest_port; // destination port
+    unsigned int sequence; // sequence number - 32 bits
+    unsigned int acknowledge; // acknowledgement number - 32 bits
+ 
+    unsigned char ns :1; //Nonce Sum Flag Added in RFC 3540.
+    unsigned char reserved_part1:3; //according to rfc
+    unsigned char data_offset:4; //The number of 32-bit words in the TCP header. This indicates where the data begins. The length of the TCP header is always a multiple of 32 bits.
+ 
+    unsigned char fin :1; //Finish Flag
+    unsigned char syn :1; //Synchronise Flag
+    unsigned char rst :1; //Reset Flag
+    unsigned char psh :1; //Push Flag
+    unsigned char ack :1; //Acknowledgement Flag
+    unsigned char urg :1; //Urgent Flag
+ 
+    unsigned char ecn :1; //ECN-Echo Flag
+    unsigned char cwr :1; //Congestion Window Reduced Flag
+ 
+    ////////////////////////////////
+ 
+    unsigned short window; // window
+    unsigned short checksum; // checksum
+    unsigned short urgent_pointer; // urgent pointer
+} TCP_HDR;
+*/
+
 
 void packet_handler(u_char *param, const struct pcap_pkthdr *header, const u_char *pkt_data)
 {
@@ -57,7 +101,7 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *header, const u_cha
     localtime_s(&ltime, &local_tv_sec);
     strftime( timestr, sizeof timestr, "%H:%M:%S", &ltime);
     
-    printf("%s,%.6d len:%d (%d)\n", timestr, header->ts.tv_usec, header->len, header->caplen); 
+    printf("%s,%.6d len:%u (%u)\n", timestr, header->ts.tv_usec, header->len, header->caplen); 
 	
 	/* retireve the position of the ip header */
     ih = (ip_header *) (pkt_data + 14); //length of ethernet header
